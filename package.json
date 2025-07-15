@@ -22,4 +22,7 @@
     "url": "https://github.com/dhruvsaija-e2m/bot-test/issues"
   },
   "homepage": "https://github.com/dhruvsaija-e2m/bot-test#readme"
+},
+"scripts": {
+  "start": "node app.js"
 }

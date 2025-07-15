@@ -8,9 +8,18 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "This is a Slack app built with Bolt for JavaScript. It launches a multi-step modal form for project kickoff using the `/service` command. The app collects project details and, for Messaging projects, gathers additional requirements, then sends the data to an n8n webhook for further automation.",
   "dependencies": {
     "@slack/bolt": "^4.4.0",
-    "dotenv": "^17.2.0"
-  }
+    "dotenv": "^17.2.0",
+    "node-fetch": "^2.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhruvsaija-e2m/bot-test.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dhruvsaija-e2m/bot-test/issues"
+  },
+  "homepage": "https://github.com/dhruvsaija-e2m/bot-test#readme"
 }

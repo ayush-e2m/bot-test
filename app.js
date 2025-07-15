@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { App } = require('@slack/bolt');
+const fetch = require('node-fetch'); // For Node <18, else remove if using Node 18+
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -8,173 +9,323 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN,
 });
 
-// /start-project shortcut handler
+// -------- Service Questions --------
+const SERVICE_QUESTIONS = {
+  Messaging: [
+    {
+      type: 'input',
+      block_id: 'messaging_complexity_level_block',
+      label: { type: 'plain_text', text: 'Messaging: Complexity Level' },
+      element: {
+        type: 'static_select',
+        action_id: 'complexity_level',
+        options: [
+          { text: { type: 'plain_text', text: 'Tier 1' }, value: 'Tier 1' },
+          { text: { type: 'plain_text', text: 'Tier 2' }, value: 'Tier 2' },
+          { text: { type: 'plain_text', text: 'Tier 3' }, value: 'Tier 3' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'messaging_client_materials_block',
+      label: { type: 'plain_text', text: 'Messaging: How many client materials to review?' },
+      element: {
+        type: 'static_select',
+        action_id: 'client_materials',
+        options: [
+          { text: { type: 'plain_text', text: '3' }, value: '3' },
+          { text: { type: 'plain_text', text: '5' }, value: '5' },
+          { text: { type: 'plain_text', text: '10' }, value: '10' },
+          { text: { type: 'plain_text', text: '15' }, value: '15' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'messaging_competitors_analyze_block',
+      label: { type: 'plain_text', text: 'Messaging: How many competitors to analyze?' },
+      element: {
+        type: 'static_select',
+        action_id: 'competitors_analyze',
+        options: [
+          { text: { type: 'plain_text', text: '2' }, value: '2' },
+          { text: { type: 'plain_text', text: '3' }, value: '3' },
+          { text: { type: 'plain_text', text: '5' }, value: '5' },
+          { text: { type: 'plain_text', text: '8' }, value: '8' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'messaging_strategy_session_block',
+      label: { type: 'plain_text', text: 'Messaging: How long of a strategy work session is required?' },
+      element: {
+        type: 'static_select',
+        action_id: 'strategy_session',
+        options: [
+          { text: { type: 'plain_text', text: '60 minutes' }, value: '60 minutes' },
+          { text: { type: 'plain_text', text: '1.5 hours' }, value: '1.5 hours' },
+          { text: { type: 'plain_text', text: '4 hours' }, value: '4 hours' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'messaging_review_rounds_block',
+      label: { type: 'plain_text', text: 'Messaging: How many rounds of review?' },
+      element: {
+        type: 'static_select',
+        action_id: 'review_rounds',
+        options: [
+          { text: { type: 'plain_text', text: 'None' }, value: 'None' },
+          { text: { type: 'plain_text', text: 'One' }, value: 'One' },
+          { text: { type: 'plain_text', text: 'Two' }, value: 'Two' },
+          { text: { type: 'plain_text', text: 'Three' }, value: 'Three' },
+        ],
+      },
+    },
+    // NEW: Immersion call duration
+    {
+      type: 'input',
+      block_id: 'messaging_immersion_call_duration_block',
+      label: { type: 'plain_text', text: 'What duration would you prefer for the immersion call?' },
+      element: {
+        type: 'static_select',
+        action_id: 'immersion_call_duration',
+        options: [
+          { text: { type: 'plain_text', text: '60 mins' }, value: '60 mins' },
+          { text: { type: 'plain_text', text: '90 mins' }, value: '90 mins' },
+          { text: { type: 'plain_text', text: '120 mins' }, value: '120 mins' },
+        ],
+      },
+    },
+    // NEW: Virtual strategic sessions
+    {
+      type: 'input',
+      block_id: 'messaging_virtual_strategic_session_block',
+      label: { type: 'plain_text', text: 'How many virtual strategic sessions?' },
+      element: {
+        type: 'static_select',
+        action_id: 'virtual_strategic_session',
+        options: [
+          { text: { type: 'plain_text', text: 'One' }, value: 'One' },
+          { text: { type: 'plain_text', text: 'Two' }, value: 'Two' },
+          { text: { type: 'plain_text', text: 'Three' }, value: 'Three' },
+        ],
+      },
+    },
+  ],
+  Advertisement: [
+    {
+      type: 'input',
+      block_id: 'advertisement_platform_block',
+      label: { type: 'plain_text', text: 'Advertisement: Platforms' },
+      element: {
+        type: 'multi_static_select',
+        action_id: 'platforms',
+        options: [
+          { text: { type: 'plain_text', text: 'Google Ads' }, value: 'Google Ads' },
+          { text: { type: 'plain_text', text: 'Facebook' }, value: 'Facebook' },
+          { text: { type: 'plain_text', text: 'Instagram' }, value: 'Instagram' },
+          { text: { type: 'plain_text', text: 'LinkedIn' }, value: 'LinkedIn' },
+          { text: { type: 'plain_text', text: 'Other' }, value: 'Other' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'advertisement_budget_block',
+      label: { type: 'plain_text', text: 'Advertisement: What is your budget?' },
+      element: {
+        type: 'plain_text_input',
+        action_id: 'budget',
+        placeholder: { type: 'plain_text', text: 'e.g. $5000/month' },
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'advertisement_duration_block',
+      label: { type: 'plain_text', text: 'Advertisement: Campaign Duration (weeks)' },
+      element: {
+        type: 'static_select',
+        action_id: 'duration',
+        options: [
+          { text: { type: 'plain_text', text: '2 weeks' }, value: '2 weeks' },
+          { text: { type: 'plain_text', text: '4 weeks' }, value: '4 weeks' },
+          { text: { type: 'plain_text', text: '8 weeks' }, value: '8 weeks' },
+        ],
+      },
+    },
+  ],
+  // Add more services/questions as needed
+};
+
+const SERVICE_OPTIONS = [
+  { text: { type: 'plain_text', text: 'Messaging' }, value: 'Messaging' },
+  { text: { type: 'plain_text', text: 'Advertisement' }, value: 'Advertisement' },
+  // Add more services here if you need
+];
+
 app.command('/service', async ({ ack, body, client }) => {
-  console.log('Received /service command', { user_id: body.user_id, trigger_id: body.trigger_id });
   await ack();
   try {
     await client.views.open({
       trigger_id: body.trigger_id,
       view: {
         type: 'modal',
-        callback_id: 'project_type_modal',
+        callback_id: 'service_intro_modal',
         title: { type: 'plain_text', text: 'Project Kickoff' },
         submit: { type: 'plain_text', text: 'Next' },
         close: { type: 'plain_text', text: 'Cancel' },
         blocks: [
           {
+            type: 'header',
+            text: { type: 'plain_text', text: 'Submitting Details' },
+          },
+          {
             type: 'input',
-            block_id: 'project_type_block',
-            label: { type: 'plain_text', text: 'Project Type' },
+            block_id: 'company_name_block',
+            label: { type: 'plain_text', text: 'Company Name' },
             element: {
-              type: 'static_select',
-              action_id: 'project_type',
-              initial_option: {
-                text: { type: 'plain_text', text: 'Messaging' },
-                value: 'Messaging',
-              },
-              options: [
-                { text: { type: 'plain_text', text: 'Architecture' }, value: 'Architecture' },
-                { text: { type: 'plain_text', text: 'Copywriting' }, value: 'Copywriting' },
-                { text: { type: 'plain_text', text: 'Messaging' }, value: 'Messaging' },
-                { text: { type: 'plain_text', text: 'Naming' }, value: 'Naming' },
-                { text: { type: 'plain_text', text: 'Research' }, value: 'Research' },
-                { text: { type: 'plain_text', text: 'Strategy' }, value: 'Strategy' },
-                { text: { type: 'plain_text', text: 'Visual Design' }, value: 'Visual Design' },
-                { text: { type: 'plain_text', text: 'Voice' }, value: 'Voice' },
-                { text: { type: 'plain_text', text: 'Web Design' }, value: 'Web Design' },
-              ],
+              type: 'plain_text_input',
+              action_id: 'company_name',
+              placeholder: { type: 'plain_text', text: 'Enter company name' },
+            },
+          },
+          {
+            type: 'input',
+            block_id: 'project_name_block',
+            label: { type: 'plain_text', text: 'Project Name' },
+            element: {
+              type: 'plain_text_input',
+              action_id: 'project_name',
+              placeholder: { type: 'plain_text', text: 'Enter project name' },
+            },
+          },
+          {
+            type: 'input',
+            block_id: 'date_block',
+            label: { type: 'plain_text', text: 'Date' },
+            element: {
+              type: 'datepicker',
+              action_id: 'date',
+              placeholder: { type: 'plain_text', text: 'Select a date' },
+            },
+          },
+          {
+            type: 'input',
+            block_id: 'services_block',
+            label: { type: 'plain_text', text: 'Services We Offer' },
+            element: {
+              type: 'multi_static_select',
+              action_id: 'services',
+              options: SERVICE_OPTIONS,
             },
           },
         ],
       },
     });
-    console.log('Initial modal opened');
   } catch (error) {
-    console.error('Error opening initial modal:', error);
+    console.error('Error opening service intro modal:', error);
   }
 });
 
-// Handle submission of the project type modal
-app.view('project_type_modal', async ({ ack, view, body }) => {
-  console.log('project_type_modal view submission received', { user: body.user.id, view_state: view.state });
-  const projectType = view.state.values.project_type_block.project_type.selected_option.value;
-  console.log('Selected project type:', projectType);
-  if (projectType === 'Messaging') {
-    console.log('Updating modal to Messaging Details');
+app.view('service_intro_modal', async ({ ack, view, body, client }) => {
+  const values = view.state.values;
+  const companyName = values.company_name_block.company_name.value;
+  const projectName = values.project_name_block.project_name.value;
+  const date = values.date_block.date.selected_date;
+  const selectedServices = values.services_block.services.selected_options.map(opt => opt.value);
+
+  // Validation
+  if (!companyName || !projectName || !date || selectedServices.length === 0) {
     await ack({
-      response_action: 'update',
-      view: {
-        type: 'modal',
-        callback_id: 'messaging_project_details',
-        title: { type: 'plain_text', text: 'Messaging Details' },
-        submit: { type: 'plain_text', text: 'Submit' },
-        close: { type: 'plain_text', text: 'Cancel' },
-        private_metadata: JSON.stringify({ projectType }),
-        blocks: [
-          {
-            type: 'input',
-            block_id: 'complexity_level_block',
-            label: { type: 'plain_text', text: 'Complexity Level' },
-            element: {
-              type: 'static_select',
-              action_id: 'complexity_level',
-              options: [
-                { text: { type: 'plain_text', text: 'Tier 1' }, value: 'Tier 1' },
-                { text: { type: 'plain_text', text: 'Tier 2' }, value: 'Tier 2' },
-                { text: { type: 'plain_text', text: 'Tier 3' }, value: 'Tier 3' },
-              ],
-            },
-          },
-          {
-            type: 'input',
-            block_id: 'client_materials_block',
-            label: { type: 'plain_text', text: 'How many client materials to review?' },
-            element: {
-              type: 'static_select',
-              action_id: 'client_materials',
-              options: [
-                { text: { type: 'plain_text', text: '3' }, value: '3' },
-                { text: { type: 'plain_text', text: '5' }, value: '5' },
-                { text: { type: 'plain_text', text: '10' }, value: '10' },
-                { text: { type: 'plain_text', text: '15' }, value: '15' },
-              ],
-            },
-          },
-          {
-            type: 'input',
-            block_id: 'competitors_analyze_block',
-            label: { type: 'plain_text', text: 'How many competitors to analyze?' },
-            element: {
-              type: 'static_select',
-              action_id: 'competitors_analyze',
-              options: [
-                { text: { type: 'plain_text', text: '2' }, value: '2' },
-                { text: { type: 'plain_text', text: '3' }, value: '3' },
-                { text: { type: 'plain_text', text: '5' }, value: '5' },
-                { text: { type: 'plain_text', text: '8' }, value: '8' },
-              ],
-            },
-          },
-          {
-            type: 'input',
-            block_id: 'strategy_session_block',
-            label: { type: 'plain_text', text: 'How long of a strategy work session is required?' },
-            element: {
-              type: 'static_select',
-              action_id: 'strategy_session',
-              options: [
-                { text: { type: 'plain_text', text: '60 minutes' }, value: '60 minutes' },
-                { text: { type: 'plain_text', text: '1.5 hours' }, value: '1.5 hours' },
-                { text: { type: 'plain_text', text: '4 hours' }, value: '4 hours' },
-              ],
-            },
-          },
-          {
-            type: 'input',
-            block_id: 'review_rounds_block',
-            label: { type: 'plain_text', text: 'How many rounds of review?' },
-            element: {
-              type: 'static_select',
-              action_id: 'review_rounds',
-              options: [
-                { text: { type: 'plain_text', text: 'None' }, value: 'None' },
-                { text: { type: 'plain_text', text: 'One' }, value: 'One' },
-                { text: { type: 'plain_text', text: 'Two' }, value: 'Two' },
-                { text: { type: 'plain_text', text: 'Three' }, value: 'Three' },
-              ],
-            },
-          },
-        ],
-      }
+      response_action: 'errors',
+      errors: {
+        company_name_block: !companyName ? 'Company name is required' : undefined,
+        project_name_block: !projectName ? 'Project name is required' : undefined,
+        date_block: !date ? 'Please select a date' : undefined,
+        services_block: selectedServices.length === 0 ? 'Select at least one service' : undefined,
+      },
     });
     return;
   }
-  console.log('Project type is not Messaging, closing modal');
-  await ack();
+
+  // Prepare service questions
+  let serviceBlocks = [];
+  selectedServices.forEach(service => {
+    if (SERVICE_QUESTIONS[service]) {
+      serviceBlocks = serviceBlocks.concat(SERVICE_QUESTIONS[service]);
+    }
+  });
+
+  await ack({
+    response_action: 'update',
+    view: {
+      type: 'modal',
+      callback_id: 'service_details_modal',
+      title: { type: 'plain_text', text: 'Service Details' },
+      submit: { type: 'plain_text', text: 'Submit' },
+      close: { type: 'plain_text', text: 'Cancel' },
+      private_metadata: JSON.stringify({
+        companyName,
+        projectName,
+        date,
+        selectedServices,
+      }),
+      blocks: [
+        {
+          type: 'section',
+          text: { type: 'plain_text', text: `Company: ${companyName}\nProject: ${projectName}\nDate: ${date}\nServices: ${selectedServices.join(', ')}` },
+        },
+        ...serviceBlocks,
+      ],
+    },
+  });
 });
 
-app.view('messaging_project_details', async ({ ack, view, body }) => {
-  console.log('messaging_project_details view submission received', { user: body.user.id, view_state: view.state });
+app.view('service_details_modal', async ({ ack, view, body }) => {
   await ack();
-  // Collect data from the modal
+
+  const { companyName, projectName, date, selectedServices } = JSON.parse(view.private_metadata || '{}');
   const values = view.state.values;
-  const meta = view.private_metadata ? JSON.parse(view.private_metadata) : {};
-  const data = {
+
+  let result = {
     user: body.user.id,
-    project_type: meta.projectType,
-    complexity_level: values.complexity_level_block.complexity_level.selected_option.value,
-    client_materials: values.client_materials_block.client_materials.selected_option.value,
-    competitors_analyze: values.competitors_analyze_block.competitors_analyze.selected_option.value,
-    strategy_session: values.strategy_session_block.strategy_session.selected_option.value,
-    review_rounds: values.review_rounds_block.review_rounds.selected_option.value,
+    company_name: companyName,
+    project_name: projectName,
+    date,
+    selected_services: selectedServices,
+    service_details: {},
   };
-  console.log('Sending data to webhook:', data);
+
+  selectedServices.forEach(service => {
+    result.service_details[service] = {};
+    (SERVICE_QUESTIONS[service] || []).forEach(block => {
+      const block_id = block.block_id;
+      const element = block.element;
+      let answer;
+      try {
+        if (element.type === 'static_select') {
+          answer = values[block_id][element.action_id]?.selected_option?.value;
+        } else if (element.type === 'multi_static_select') {
+          answer = (values[block_id][element.action_id]?.selected_options || []).map(opt => opt.value);
+        } else if (element.type === 'plain_text_input') {
+          answer = values[block_id][element.action_id]?.value;
+        } else if (element.type === 'datepicker') {
+          answer = values[block_id][element.action_id]?.selected_date;
+        }
+      } catch (e) {}
+      result.service_details[service][block_id] = answer;
+    });
+  });
+
   try {
-    const response = await fetch('https://n8n.sitepreviews.dev/webhook/3cee73bb-dda9-4adb-8b5c-f3b9c383115e', {
+    const response = await fetch('https://n8n.sitepreviews.dev/webhook-test/b9223a9e-8b4a-4235-8b5f-144fcf3f27a4', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(result),
     });
     const respText = await response.text();
     console.log('Webhook response:', respText);
@@ -186,4 +337,4 @@ app.view('messaging_project_details', async ({ ack, view, body }) => {
 (async () => {
   await app.start(process.env.PORT || 3000);
   console.log('⚡️ Slack Bolt app is running!');
-})(); 
+})();

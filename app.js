@@ -457,7 +457,7 @@ app.view('service_details_modal', async ({ ack, view, body }) => {
   });
 
   try {
-    const response = await fetch('https://n8n.sitepreviews.dev/webhook-test/b9223a9e-8b4a-4235-8b5f-144fcf3f27a4', {
+    const response = await fetch('https://n8n.sitepreviews.dev/webhook/b9223a9e-8b4a-4235-8b5f-144fcf3f27a4', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(result),

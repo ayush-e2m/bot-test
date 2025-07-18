@@ -158,12 +158,147 @@ const SERVICE_QUESTIONS = {
       },
     },
   ],
-  // Add more services/questions as needed
+  Naming: [
+    {
+      type: 'input',
+      block_id: 'naming_client_materials_block',
+      label: { type: 'plain_text', text: 'Naming: How many client materials to review?' },
+      element: {
+        type: 'static_select',
+        action_id: 'client_materials',
+        options: [
+          { text: { type: 'plain_text', text: '3' }, value: '3' },
+          { text: { type: 'plain_text', text: '5' }, value: '5' },
+          { text: { type: 'plain_text', text: '10' }, value: '10' },
+          { text: { type: 'plain_text', text: '15' }, value: '15' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'naming_stakeholders_interview_block',
+      label: { type: 'plain_text', text: 'Naming: How many stakeholders to interview?' },
+      element: {
+        type: 'static_select',
+        action_id: 'stakeholders_interview',
+        options: [
+          { text: { type: 'plain_text', text: '4' }, value: '4' },
+          { text: { type: 'plain_text', text: '8' }, value: '8' },
+          { text: { type: 'plain_text', text: '12' }, value: '12' },
+          { text: { type: 'plain_text', text: '20' }, value: '20' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'naming_competitors_analyze_block',
+      label: { type: 'plain_text', text: 'Naming: How many competitors to analyze?' },
+      element: {
+        type: 'static_select',
+        action_id: 'competitors_analyze',
+        options: [
+          { text: { type: 'plain_text', text: '2' }, value: '2' },
+          { text: { type: 'plain_text', text: '3' }, value: '3' },
+          { text: { type: 'plain_text', text: '5' }, value: '5' },
+          { text: { type: 'plain_text', text: '8' }, value: '8' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'naming_creative_territories_block',
+      label: { type: 'plain_text', text: 'Naming: How many unique creative naming territories?' },
+      element: {
+        type: 'static_select',
+        action_id: 'creative_territories',
+        options: [
+          { text: { type: 'plain_text', text: '2' }, value: '2' },
+          { text: { type: 'plain_text', text: '4' }, value: '4' },
+          { text: { type: 'plain_text', text: '6' }, value: '6' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'naming_options_block',
+      label: { type: 'plain_text', text: 'Naming: How many naming options?' },
+      element: {
+        type: 'static_select',
+        action_id: 'naming_options',
+        options: [
+          { text: { type: 'plain_text', text: '100' }, value: '100' },
+          { text: { type: 'plain_text', text: '200' }, value: '200' },
+          { text: { type: 'plain_text', text: '300' }, value: '300' },
+          { text: { type: 'plain_text', text: '400' }, value: '400' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'naming_prescreened_candidates_block',
+      label: { type: 'plain_text', text: 'Naming: How many pre-screened name candidates?' },
+      element: {
+        type: 'static_select',
+        action_id: 'prescreened_candidates',
+        options: [
+          { text: { type: 'plain_text', text: '10' }, value: '10' },
+          { text: { type: 'plain_text', text: '20' }, value: '20' },
+          { text: { type: 'plain_text', text: '30' }, value: '30' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'naming_legal_vetted_block',
+      label: { type: 'plain_text', text: 'Naming: How many shortlist name candidates are legally vetted?' },
+      element: {
+        type: 'static_select',
+        action_id: 'legal_vetted',
+        options: [
+          { text: { type: 'plain_text', text: '3' }, value: '3' },
+          { text: { type: 'plain_text', text: '6' }, value: '6' },
+          { text: { type: 'plain_text', text: '8' }, value: '8' },
+          { text: { type: 'plain_text', text: '10' }, value: '10' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'naming_complexity_level_block',
+      label: { type: 'plain_text', text: 'Naming: Complexity Level' },
+      element: {
+        type: 'static_select',
+        action_id: 'complexity_level',
+        options: [
+          { text: { type: 'plain_text', text: 'Tier 1' }, value: 'Tier 1' },
+          { text: { type: 'plain_text', text: 'Tier 2' }, value: 'Tier 2' },
+          { text: { type: 'plain_text', text: 'Tier 3' }, value: 'Tier 3' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'naming_shortlist_legal_vetting_block',
+      label: { type: 'plain_text', text: 'Naming: How many shortlist name candidates for legal vetting?' },
+      element: {
+        type: 'static_select',
+        action_id: 'shortlist_legal_vetting',
+        options: [
+          { text: { type: 'plain_text', text: '30' }, value: '30' },
+          { text: { type: 'plain_text', text: '50' }, value: '50' },
+          { text: { type: 'plain_text', text: '70' }, value: '70' },
+          { text: { type: 'plain_text', text: '100' }, value: '100' },
+        ],
+      },
+    },
+  ],
+  // ...other services...
 };
 
 const SERVICE_OPTIONS = [
   { text: { type: 'plain_text', text: 'Messaging' }, value: 'Messaging' },
   { text: { type: 'plain_text', text: 'Advertisement' }, value: 'Advertisement' },
+  { text: { type: 'plain_text', text: 'Naming' }, value: 'Naming' },  // Added Naming
   // Add more services here if you need
 ];
 
@@ -322,7 +457,7 @@ app.view('service_details_modal', async ({ ack, view, body }) => {
   });
 
   try {
-    const response = await fetch('https://n8n.sitepreviews.dev/webhook/b9223a9e-8b4a-4235-8b5f-144fcf3f27a4', {
+    const response = await fetch('https://n8n.sitepreviews.dev/webhook-test/b9223a9e-8b4a-4235-8b5f-144fcf3f27a4', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(result),

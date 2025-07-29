@@ -293,26 +293,6 @@ const SERVICE_QUESTIONS = {
   Strategy: [
     {
       type: 'input',
-      block_id: 'strategy_project_type_block',
-      label: { type: 'plain_text', text: 'Brand Strategy: Project Type' },
-      element: {
-        type: 'static_select',
-        action_id: 'project_type',
-        options: [
-          { text: { type: 'plain_text', text: 'Architecture' }, value: 'Architecture' },
-          { text: { type: 'plain_text', text: 'Copywriting' }, value: 'Copywriting' },
-          { text: { type: 'plain_text', text: 'Messaging' }, value: 'Messaging' },
-          { text: { type: 'plain_text', text: 'Naming' }, value: 'Naming' },
-          { text: { type: 'plain_text', text: 'Research' }, value: 'Research' },
-          { text: { type: 'plain_text', text: 'Strategy' }, value: 'Strategy' },
-          { text: { type: 'plain_text', text: 'Visual Design' }, value: 'Visual Design' },
-          { text: { type: 'plain_text', text: 'Voice' }, value: 'Voice' },
-          { text: { type: 'plain_text', text: 'Web Design' }, value: 'Web Design' },
-        ],
-      },
-    },
-    {
-      type: 'input',
       block_id: 'strategy_complexity_level_block',
       label: { type: 'plain_text', text: 'Complexity Level' },
       element: {

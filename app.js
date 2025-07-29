@@ -2,14 +2,14 @@ require('dotenv').config();
 const { App } = require('@slack/bolt');
 const fetch = require('node-fetch'); // For Node <18, else remove if using Node 18+
 
-const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET,
-  socketMode: true,
-  appToken: process.env.SLACK_APP_TOKEN,
-});
+const SERVICE_OPTIONS = [
+  { text: { type: 'plain_text', text: 'Messaging' }, value: 'Messaging' },
+  { text: { type: 'plain_text', text: 'Advertisement' }, value: 'Advertisement' },
+  { text: { type: 'plain_text', text: 'Naming' }, value: 'Naming' },
+  { text: { type: 'plain_text', text: 'Strategy' }, value: 'Strategy' }, // Added
+  // Add more services here if you need
+];
 
-// -------- Service Questions --------
 const SERVICE_QUESTIONS = {
   Messaging: [
     {
@@ -85,7 +85,6 @@ const SERVICE_QUESTIONS = {
         ],
       },
     },
-    // NEW: Immersion call duration
     {
       type: 'input',
       block_id: 'messaging_immersion_call_duration_block',
@@ -100,7 +99,6 @@ const SERVICE_QUESTIONS = {
         ],
       },
     },
-    // NEW: Virtual strategic sessions
     {
       type: 'input',
       block_id: 'messaging_virtual_strategic_session_block',
@@ -292,15 +290,94 @@ const SERVICE_QUESTIONS = {
       },
     },
   ],
+  Strategy: [
+    {
+      type: 'input',
+      block_id: 'strategy_project_type_block',
+      label: { type: 'plain_text', text: 'Brand Strategy: Project Type' },
+      element: {
+        type: 'static_select',
+        action_id: 'project_type',
+        options: [
+          { text: { type: 'plain_text', text: 'Architecture' }, value: 'Architecture' },
+          { text: { type: 'plain_text', text: 'Copywriting' }, value: 'Copywriting' },
+          { text: { type: 'plain_text', text: 'Messaging' }, value: 'Messaging' },
+          { text: { type: 'plain_text', text: 'Naming' }, value: 'Naming' },
+          { text: { type: 'plain_text', text: 'Research' }, value: 'Research' },
+          { text: { type: 'plain_text', text: 'Strategy' }, value: 'Strategy' },
+          { text: { type: 'plain_text', text: 'Visual Design' }, value: 'Visual Design' },
+          { text: { type: 'plain_text', text: 'Voice' }, value: 'Voice' },
+          { text: { type: 'plain_text', text: 'Web Design' }, value: 'Web Design' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'strategy_complexity_level_block',
+      label: { type: 'plain_text', text: 'Complexity Level' },
+      element: {
+        type: 'static_select',
+        action_id: 'complexity_level',
+        options: [
+          { text: { type: 'plain_text', text: 'Tier 1' }, value: 'Tier 1' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'strategy_client_materials_block',
+      label: { type: 'plain_text', text: 'How many client materials to review?' },
+      element: {
+        type: 'static_select',
+        action_id: 'client_materials',
+        options: [
+          { text: { type: 'plain_text', text: '3' }, value: '3' },
+          { text: { type: 'plain_text', text: '5' }, value: '5' },
+          { text: { type: 'plain_text', text: '10' }, value: '10' },
+          { text: { type: 'plain_text', text: '15' }, value: '15' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'strategy_competitors_analyze_block',
+      label: { type: 'plain_text', text: 'How many competitors to analyze?' },
+      element: {
+        type: 'static_select',
+        action_id: 'competitors_analyze',
+        options: [
+          { text: { type: 'plain_text', text: '2' }, value: '2' },
+          { text: { type: 'plain_text', text: '3' }, value: '3' },
+          { text: { type: 'plain_text', text: '5' }, value: '5' },
+          { text: { type: 'plain_text', text: '8' }, value: '8' },
+        ],
+      },
+    },
+    {
+      type: 'input',
+      block_id: 'strategy_stakeholders_interview_block',
+      label: { type: 'plain_text', text: 'How many stakeholders to interview?' },
+      element: {
+        type: 'static_select',
+        action_id: 'stakeholders_interview',
+        options: [
+          { text: { type: 'plain_text', text: '4' }, value: '4' },
+          { text: { type: 'plain_text', text: '8' }, value: '8' },
+          { text: { type: 'plain_text', text: '12' }, value: '12' },
+          { text: { type: 'plain_text', text: '20' }, value: '20' },
+        ],
+      },
+    },
+  ],
   // ...other services...
 };
 
-const SERVICE_OPTIONS = [
-  { text: { type: 'plain_text', text: 'Messaging' }, value: 'Messaging' },
-  { text: { type: 'plain_text', text: 'Advertisement' }, value: 'Advertisement' },
-  { text: { type: 'plain_text', text: 'Naming' }, value: 'Naming' },  // Added Naming
-  // Add more services here if you need
-];
+const app = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  socketMode: true,
+  appToken: process.env.SLACK_APP_TOKEN,
+});
 
 app.command('/service', async ({ ack, body, client }) => {
   await ack();

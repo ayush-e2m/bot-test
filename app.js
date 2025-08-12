@@ -182,9 +182,9 @@ function buildComplexityBlock(service) {
       type: 'static_select',
       action_id: 'complexity_level',
       options: [
-        { text: { type: 'plain_text', text: 'Tier 1' }, value: 'Tier 1' },
-        { text: { type: 'plain_text', text: 'Tier 2' }, value: 'Tier 2' },
-        { text: { type: 'plain_text', text: 'Tier 3' }, value: 'Tier 3' },
+        { text: { type: 'plain_text', text: 'Light' }, value: 'Light' },
+        { text: { type: 'plain_text', text: 'Medium' }, value: 'Medium' },
+        { text: { type: 'plain_text', text: 'Large' }, value: 'Large' },
       ],
     },
   };
